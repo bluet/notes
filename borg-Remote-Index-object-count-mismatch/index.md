@@ -67,9 +67,7 @@ where:
 
 Or, alternatively, you can run this command to get a shell in the Flatpak:
 
-    flatpak run --command=borg --filesystem=host com.borgbase.Vorta shell
-    or
-        flatpak run --command=bash --filesystem=host com.borgbase.Vorta
+    flatpak run --command=bash com.borgbase.Vorta
 
 and then run this command inside the Flatpak:
 
@@ -83,19 +81,52 @@ where:
 * `--filesystem=host` is needed to access the SSH keys in `~/.ssh`
 
 
+## Full log of my fix
 
-<!-- This can happen if you have deleted some backups from the remote repository, or if you have deleted the remote repository and created a new one with the same name. In either case, the local repository will have a different number of backups than the remote repository. Borg will refuse to sync the two repositories until you fix this. To fix it, run this command:
+    bluet@ocisly:~$ flatpak run --command=bash com.borgbase.Vorta
+    bluet@ocisly:~$  /app/bin/borg check --repair --info --progress <login-user>@<remote-server>:<repository-path>
+    This is a potentially dangerous function.
+    check --repair might lead to data loss (for kinds of corruption it is not
+    capable of dealing with). BE VERY CAREFUL!
 
-    borg prune --list --keep-within 1d --keep-daily 1 --keep-weekly 1 --keep-monthly 1 --keep-yearly 1 --prefix <prefix> <remote> <repository> --dry-run --show-rc --stats --info --debug
+    Type 'YES' if you understand this and want to continue: YES
+    Remote: Starting repository check
+    Remote: finished segment check at segment 5697
+    Remote: Starting repository index check
+    Remote: Finished full repository check, no problems found.
+    Starting archive consistency check...
+    Enter passphrase for key ssh://<login-user>@<remote-server>:<repository-path>: 
+    Analyzing archive ocisly-2021-12-30-030000 (1/21)
+    Analyzing archive ocisly-2022-07-17-030000 (2/21)
+    Analyzing archive ocisly-2022-11-30-030038 (3/21)
+    Analyzing archive ocisly-2022-12-31-030007 (4/21)
+    Analyzing archive ocisly-2023-01-31-030000 (5/21)
+    Analyzing archive ocisly-2023-02-28-025959 (6/21)
+    Analyzing archive ocisly-2023-03-26-030000 (7/21)
+    Analyzing archive ocisly-2023-03-31-025959 (8/21)
+    Analyzing archive ocisly-2023-04-02-025959 (9/21)
+    Analyzing archive ocisly-2023-04-05-030000 (10/21)
+    Analyzing archive ocisly-2023-04-16-030000 (11/21)
+    Analyzing archive ocisly-2023-04-21-030000 (12/21)
+    Analyzing archive ocisly-2023-04-23-025959 (13/21)
+    Analyzing archive ocisly-2023-04-24-025959 (14/21)
+    Analyzing archive ocisly-2023-04-26-030000 (15/21)
+    Analyzing archive ocisly-2023-04-29-030000 (16/21)
+    Analyzing archive ocisly-2023-04-30-030000 (17/21)
+    Analyzing archive ocisly-2023-05-01-030000 (18/21)
+    Analyzing archive ocisly-2023-05-02-030000 (19/21)
+    Analyzing archive ocisly-2023-05-03-030000 (20/21)
+    Analyzing archive ocisly-2023-05-07-025959 (21/21)
+    2 orphaned objects found!
+    Deleting 2 orphaned and 27 superseded objects...
+    Finished deleting orphaned/superseded objects.
+    Writing Manifest.
+    Committing repo.
+    Archive consistency check complete, problems found.
 
-where:
 
-* `<prefix>` is the prefix of the repository (e.g. `myserver`)
-* `<remote>` is the remote repository (e.g. `mybackupserver:/backups`)
-* `<repository>` is the name of the repository (e.g. `myserver`)
-* `--dry-run` will show you what it will do without actually doing it
-* `--show-rc` will show you the return code
-* `--stats` will show you the statistics
-* `--info` will show you the info
-* `--debug` will show you the debug info -->
+## References
+
+- https://github.com/borgbackup/borg/issues/1598
+- https://github.com/borgbackup/borg/issues/1852
 
